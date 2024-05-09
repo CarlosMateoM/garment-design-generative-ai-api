@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\GarmentDesign;
-use Illuminate\Http\Request;
 
 class UserSurveyStatusController extends Controller
 {

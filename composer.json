@@ -9,6 +9,7 @@
         "guzzlehttp/guzzle": "^7.8",
         "intervention/image": "^2",
         "laravel/framework": "^10.10",
+        "laravel/reverb": "@beta",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "spatie/laravel-permission": "*",
