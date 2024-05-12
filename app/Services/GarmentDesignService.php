@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Jobs\ProcessGarmentDesing;
 use App\Models\GarmentDesign;
 use App\Models\User;
+use App\Services\OpenAI\ChatCompletionService;
+use App\Services\OpenAI\DalleService;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
@@ -14,18 +16,24 @@ class GarmentDesignService
 {
 
     private DalleService $dalleService;
+    private ChatCompletionService $chatCompletionService;
 
-    public function __construct(DalleService $dalleService)
-    {
+    public function __construct(
+        DalleService $dalleService,
+        ChatCompletionService $chatCompletionService
+    ) {
         $this->dalleService = $dalleService;
+        $this->chatCompletionService = $chatCompletionService;
     }
 
     public function storeGarmentDesign(User $user, String $prompt)
     {
 
-        try {
+        $this->chatCompletionService->validatePrompt($prompt);
 
-            DB::beginTransaction();
+        DB::beginTransaction();
+
+        try {
 
             $image = $this->dalleService->imageGeneration($prompt);
 
@@ -44,7 +52,7 @@ class GarmentDesignService
             DB::commit();
 
         } catch (RequestException $e) {
-            
+
             DB::rollBack();
 
             Log::error($e->getMessage());

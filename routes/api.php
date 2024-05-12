@@ -28,8 +28,8 @@ Route::prefix('v1')->group(function () {
 
         Route::get('user-survey-status', [UserSurveyStatusController::class, 'index']);
         
-        Route::post('garment-designs', [GarmentDesignController::class, 'store'])
-                                        ->middleware(CheckCreditsAndSurveys::class);
+        Route::post('garment-designs', [GarmentDesignController::class, 'store']);
+                                       // ->middleware(CheckCreditsAndSurveys::class);
 
         Route::apiResource('quality-indicators', QualityIndicatorsController::class);
     });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InvalidPromptException;
 use App\Http\Requests\StoreGarmentDesignRequest;
 use App\Models\GarmentDesign;
 use App\Services\GarmentDesignService;
@@ -36,11 +37,16 @@ class GarmentDesignController extends Controller
      */
     public function store(StoreGarmentDesignRequest $request)
     {
-        $this->garmentDesignService->storeGarmentDesign(
-            $request->user(), $request->prompt
-        );
+        try {
 
-        return response()->json(null , 201);
+            $this->garmentDesignService->storeGarmentDesign(
+                $request->user(),
+                $request->prompt
+            );
+        } catch (InvalidPromptException $e) {
+
+            return $e->toJsonResponse();
+        }
     }
 
     /**
