@@ -27,7 +27,8 @@ class GarmentDesignController extends Controller
         $query = QueryBuilder::for(GarmentDesign::class)
             ->allowedFilters(['user_id', 'prompt', 'revised_prompt'])
             ->allowedSorts('created_at')
-            ->get();
+            ->paginate()
+            ->appends(request()->query());
 
         return response()->json($query);
     }
@@ -43,6 +44,7 @@ class GarmentDesignController extends Controller
                 $request->user(),
                 $request->prompt
             );
+            
         } catch (InvalidPromptException $e) {
 
             return $e->toJsonResponse();
