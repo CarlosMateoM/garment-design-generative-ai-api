@@ -13,7 +13,7 @@ class OpenAIClient extends Client
             'headers' => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
             ]
         ]);
     }
