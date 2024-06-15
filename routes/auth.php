@@ -27,7 +27,7 @@ Route::prefix('api/v1')->group(function () {
         ->name('password.store');
 
     Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
+        ->middleware(['throttle:6,1'])
         ->name('verification.verify');
 
     Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
