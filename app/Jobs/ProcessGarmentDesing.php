@@ -50,21 +50,27 @@ class ProcessGarmentDesing implements ShouldQueue
  
 
             $originalImage = $imageDownloadService->downloadImage($this->imageUrl);
+            Log::info('Image downloaded');
                         
             $originalImageSaved = $imageService->createImage($originalImage, 'png');
+            Log::info('Image saved');
             
             $designService->attacthImage($this->garmendDesignId, $originalImageSaved->id);
+            Log::info('Image attached to design');
 
             $optimizedImage = $imageOptimizationService->optimizeImageToWebP($originalImage);
+            Log::info('Image optimized');
 
             $optimizedImageSaved = $imageService->createImage($optimizedImage, 'webp');
+            Log::info('Optimized image saved');
 
             $designService->attacthImage($this->garmendDesignId, $optimizedImageSaved->id);
-
+            Log::info('Optimized image attached to design');
+    
             $garmentDesign = $designService->findDesignById($this->garmendDesignId);
+            Log::info('Design found');
 
             SendOptimizedImage::dispatch($garmentDesign);
-
-        
+            Log::info('SendOptimizedImage dispatched');
     }
 }
