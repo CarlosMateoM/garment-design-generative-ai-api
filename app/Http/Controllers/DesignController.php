@@ -37,7 +37,9 @@ class DesignController extends Controller
             $request->prompt
         );
 
-        return response()->json([], 201);
+        return response()->json([
+            'message' => 'Design created successfully'
+        ], 201);
     }
 
     /**

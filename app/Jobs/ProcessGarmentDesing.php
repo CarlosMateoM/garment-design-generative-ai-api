@@ -47,7 +47,7 @@ class ProcessGarmentDesing implements ShouldQueue
         ImageOptimizationService $imageOptimizationService
     ): void {
 
-        try {
+ 
 
             $originalImage = $imageDownloadService->downloadImage($this->imageUrl);
                         
@@ -65,9 +65,6 @@ class ProcessGarmentDesing implements ShouldQueue
 
             SendOptimizedImage::dispatch($garmentDesign);
 
-        } catch (Exception $e) {
-
-            Log::error('Error al procesar la imagen: ' . $e->getMessage());
-        }
+        
     }
 }
