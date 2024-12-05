@@ -2,19 +2,17 @@
 
 namespace App\Jobs;
 
-use App\Models\GarmentDesign;
-use Carbon\Carbon;
+use App\Services\DesignService;
+use App\Services\Image\ImageDownloadService;
+use App\Services\Image\ImageOptimizationService;
+use App\Services\Image\ImageService;
 use Exception;
-use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Str;
 
 /**
  * Class ProcessGarmentDesignJob
@@ -29,76 +27,46 @@ class ProcessGarmentDesing implements ShouldQueue
 
     private $user;
 
-    /**
-     * @var string $imageUrl The URL of the image to download.
-     */
     private $imageUrl;
 
-    /**
-     * @var int $garmentDesignId The ID of the GarmentDesign record 
-     * associated with this image.
-     */
     private $garmendDesignId;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param string $imageUrl The URL of the image to download.
-     * @param int $garmentDesignId The ID of the GarmentDesign record.
-     *
-     * @return void
-     */
+
     public function __construct($user,  $garmendDesignId,  $imageUrl)
-    {
+    {  
         $this->user = $user;
         $this->garmendDesignId = $garmendDesignId;
         $this->imageUrl = $imageUrl;
     }
 
-    /**
-     * Execute the job.
-     *
-     * This method handles the downloading, optimization, and storage
-     * of the image associated with the provided URL.
-     *
-     * @return void
-     */
-    public function handle(): void
-    {
+
+    public function handle(
+        DesignService $designService,
+        ImageService $imageService,
+        ImageDownloadService $imageDownloadService,
+        ImageOptimizationService $imageOptimizationService
+    ): void {
+
         try {
-            // Create a Guzzle HTTP client for downloading the image
-            $client = new Client();
 
-            // Generate a unique filename based on current timestamp
-            $date = Carbon::now()->format('Y-m-d-H-i-s-u') . Str::random(5);
-            $originalName = 'img-' . $date . '.png';
+            $originalImage = $imageDownloadService->downloadImage($this->imageUrl);
+                        
+            $originalImageSaved = $imageService->createImage($originalImage, 'png');
+            
+            $designService->attacthImage($this->garmendDesignId, $originalImageSaved->id);
 
-            // Download the image and store it in the public/images directory
-            $client->get($this->imageUrl, ['sink' => storage_path('app/public/images/' . $originalName)]);
+            $optimizedImage = $imageOptimizationService->optimizeImageToWebP($originalImage);
 
-            // Read the downloaded image content
-            $originalFile = file_get_contents(storage_path('app/public/images/' . $originalName));
+            $optimizedImageSaved = $imageService->createImage($optimizedImage, 'webp');
 
-            // Generate a new filename with a '.jpg' extension for optimized image
-            $optimizedName = 'img-' . $date . '.jpg';
+            $designService->attacthImage($this->garmendDesignId, $optimizedImageSaved->id);
 
-            // Use Intervention Image library to optimize the image (reduce quality)
-            $optimizedFile = Image::make($originalFile)->encode('jpg', 80);
+            $garmentDesign = $designService->findDesignById($this->garmendDesignId);
 
-            // Store the optimized image in the public/images/optimized directory
-            Storage::disk('public')->put('images/optimized/' . $optimizedName, $optimizedFile);
-
-            // Find the GarmentDesign record associated with this job
-            $garmentDesign = GarmentDesign::find($this->garmendDesignId);
-
-            // Update the garment design record with the optimized image URL
-            $garmentDesign->url = asset('storage/images/optimized/' . $optimizedName);
-            $garmentDesign->save();
-
-            // Dispatch a new job to send the optimized image
             SendOptimizedImage::dispatch($garmentDesign);
 
         } catch (Exception $e) {
+
             Log::error('Error al procesar la imagen: ' . $e->getMessage());
         }
     }

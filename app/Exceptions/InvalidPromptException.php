@@ -7,29 +7,26 @@ use Exception;
 class InvalidPromptException extends Exception
 {
 
-    protected $generatedDescription;
+    protected $statusCode;
 
-    public function __construct(
-        $generatedDescription, 
-        $message = 'La descripción proporcionada no es válida para una prenda de vestir. Hemos generado una descripción alternativa basada en la información ingresada.')
+    protected $alternativeDescription;
+
+    public function __construct($message, $alternativeDescription = '',  $statusCode = 400)
     {
-
-        $this->generatedDescription = $generatedDescription;
-
         parent::__construct($message);
+        $this->statusCode = $statusCode;
+        $this->alternativeDescription = $alternativeDescription;
+    }
+    
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 
-    public function getGeneratedDescription()
+    public function getAlternativeDescription()
     {
-        return $this->generatedDescription;
+        return $this->alternativeDescription;
     }
 
-    public function toJsonResponse()
-    {
-        return response()->json([
-            'message' => $this->getMessage(),
-            'generatedDescription' => $this->getGeneratedDescription()
-        ], 400);
-    }
 
 }

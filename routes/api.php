@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\GarmentDesignController;
+use App\Http\Controllers\DesignController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ImageDescriptionController;
 use App\Http\Controllers\QualityIndicatorsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSurveyStatusController;
@@ -20,7 +22,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    Route::get('garment-designs', [GarmentDesignController::class, 'index']);
+    Route::get('garment-designs', [DesignController::class, 'index']);
+    
+    Route::post('images', [ImageController::class, 'store']);
+
+    Route::post('images/description', ImageDescriptionController::class);
+
+    
 
     Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -28,8 +36,11 @@ Route::prefix('v1')->group(function () {
 
         Route::get('user-survey-status', [UserSurveyStatusController::class, 'index']);
         
-        Route::post('garment-designs', [GarmentDesignController::class, 'store'])
-                                        ->middleware(['verified', CheckCreditsAndSurveys::class]);
+        Route::get('designs/{design}', [DesignController::class, 'show']);
+
+
+        Route::post('garment-designs', [DesignController::class, 'store']);
+                                        //->middleware(['verified', CheckCreditsAndSurveys::class]);
 
         Route::apiResource('quality-indicators', QualityIndicatorsController::class);
     });
