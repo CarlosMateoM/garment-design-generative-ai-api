@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Type\Integer;
 
 class GarmentDesign extends Model
 {
@@ -12,14 +11,19 @@ class GarmentDesign extends Model
 
     protected $fillable = [
         'user_id',
-        'url',
         'prompt',
-        'revised_prompt',    
+        'revised_prompt',
     ];
+
+
+    public function images()
+    {
+        return $this->belongsToMany(Image::class, 'garment_designs_images');
+    }
+
 
     public function qualityIndicators()
     {
         return $this->hasOne(QualityIndicators::class);
     }
-
 }

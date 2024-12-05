@@ -14,22 +14,19 @@ class SendOptimizedImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private GarmentDesign $garmentDesign;
-
     /**
      * Create a new job instance.
      */
-    public function __construct(GarmentDesign $garmentDesign)
-    {
-        $this->garmentDesign = $garmentDesign;
-    }
+    public function __construct(
+        private GarmentDesign $garmentDesign
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        
+
         ImageProcessedEvent::dispatch(
             $this->garmentDesign
         );
