@@ -47,6 +47,7 @@ class ProcessGarmentDesing implements ShouldQueue
         ImageOptimizationService $imageOptimizationService
     ): void {
 
+
  
 
             $originalImage = $imageDownloadService->downloadImage($this->imageUrl);

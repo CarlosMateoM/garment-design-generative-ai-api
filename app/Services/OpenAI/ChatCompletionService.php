@@ -112,7 +112,7 @@ class ChatCompletionService
             );
         }
 
-        return json_decode($content);
+        return $content;
     }
 
     public function classifyImage(String $url)
